@@ -26,3 +26,20 @@ class InstitutesData(Institutes):
     founded_in = Column(String)
     about = Column(Text)
     address = Column(String)
+
+class CourseNames(Base):
+    __tablename__ = "course_names"
+    name = Column(String)
+    fullname = Column(String)
+
+class CourseLevels(Base):
+    __tablename__ = "course_levels"
+    id = Column(Integer , primary_key = True)
+    name = Column(String)
+
+class Courses(Base):
+    __tablename__ = "courses"
+    id = Column(Integer , primary_key = True)
+    course_id = Column(Integer , ForeignKey("course_names.id"))
+    level_id = Column(Integer , ForeignKey("course_levels.id"))
+    duration = Column(String)

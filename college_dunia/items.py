@@ -40,3 +40,9 @@ class InstituteItem(Item):
                 input_processor = MapCompose( remove_tags , enter_filter),
                 output_processor = Join()
     )
+
+class CourseName(Item):
+    name = Field()
+
+class CourseLevel(Item):
+    name = Field()
