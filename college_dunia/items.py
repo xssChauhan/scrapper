@@ -31,12 +31,4 @@ class InstituteItem(Item):
     )
     status = Field(output_processor = Join())
     website = Field( output_processor = Join())
-    founded_in = Field(
-        output_processor = Compose(Join()))
-    about = Field(
-        output_processor = Compose(stupid_filter,ascii_filter,Join())
-    )
-    address = Field(
-                input_processor = MapCompose( remove_tags , enter_filter),
-                output_processor = Join()
-    )
+    address = Field(output_processor = Join())
