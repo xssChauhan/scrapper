@@ -29,6 +29,7 @@ class InstitutesData(Institutes):
 
 class CourseNames(Base):
     __tablename__ = "course_names"
+    id = Column(Integer , primary_key = True)
     name = Column(String)
     fullname = Column(String)
 

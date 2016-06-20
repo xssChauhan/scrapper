@@ -10,9 +10,9 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'college_dunia'
-
+USER_AGENT = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
 SPIDER_MODULES = ['college_dunia.spiders']
 NEWSPIDER_MODULE = 'college_dunia.spiders'
+DOWNLOAD_DELAY = 2
 
-
-ITEM_PIPELINES = ['college_dunia.pipelines.DBPipeline']
+ITEM_PIPELINES = ['college_dunia.pipelines.InstituteDBPipeline']
