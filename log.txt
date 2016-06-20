@@ -7445,3 +7445,156 @@ INFO: Dumping Scrapy stats:
  'scheduler/enqueued/memory': 6,
  'start_time': datetime.datetime(2016, 6, 18, 14, 0, 15, 835693)}
 INFO: Spider closed (finished)
+INFO: Scrapy 1.0.5.post4+g4b324a8 started (bot: college_dunia)
+INFO: Optional features available: ssl, http11
+INFO: Overridden settings: {'NEWSPIDER_MODULE': 'college_dunia.spiders', 'SPIDER_MODULES': ['college_dunia.spiders'], 'BOT_NAME': 'college_dunia'}
+INFO: Enabled extensions: CloseSpider, TelnetConsole, LogStats, CoreStats, SpiderState
+INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, UserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+WARNING: /usr/lib/pymodules/python2.7/scrapy/pipelines/__init__.py:21: ScrapyDeprecationWarning: ITEM_PIPELINES defined as a list or a set is deprecated, switch to a dict
+  category=ScrapyDeprecationWarning, stacklevel=1)
+
+INFO: Enabled item pipelines: DBPipeline
+INFO: Spider opened
+INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+DEBUG: Telnet console listening on 127.0.0.1:6023
+DEBUG: Crawled (200) <GET http://collegedunia.com/pharmacy/solan-colleges> (referer: None)
+DEBUG: Crawled (200) <GET http://collegedunia.com/university/25565-shoolini-university-solan> (referer: http://collegedunia.com/pharmacy/solan-colleges)
+DEBUG: Crawled (200) <GET http://collegedunia.com/college/9621-lr-institute-of-pharmacy-solan> (referer: http://collegedunia.com/pharmacy/solan-colleges)
+DEBUG: Crawled (200) <GET http://collegedunia.com/university/25563-manav-bharti-university-mbu-solan> (referer: http://collegedunia.com/pharmacy/solan-colleges)
+DEBUG: Crawled (200) <GET http://collegedunia.com/university/25787-lovely-professional-university-lpu-jalandhar> (referer: http://collegedunia.com/pharmacy/solan-colleges)
+DEBUG: Scraped from <200 http://collegedunia.com/university/25565-shoolini-university-solan>
+{'about': u',',
+ 'address': u'Village Bajhol, P.O. Sultanpur, Oachghat-Kumarhatti Highway    Solan - 173229    Himachal Pradesh ,    India',
+ 'founded_in': u' Estd 2009',
+ 'name': u'Shoolini University, Solan',
+ 'status': u's',
+ 'website': u'http://www.shooliniuniversity.com'}
+DEBUG: Crawled (200) <GET http://collegedunia.com/university/25561-jaypee-university-of-information-technology-juit-solan> (referer: http://collegedunia.com/pharmacy/solan-colleges)
+DEBUG: Scraped from <200 http://collegedunia.com/college/9621-lr-institute-of-pharmacy-solan>
+{'about': u'i',
+ 'address': u'Village Jabli P.O. Ochghat Rajgarh Road Solan    Solan - 173223    Himachal Pradesh ,    India',
+ 'founded_in': u' Private',
+ 'name': u'LR Institute of Pharmacy, Solan',
+ 'status': u's',
+ 'website': u'http://www.lrinstitutes.com/pharma.php'}
+DEBUG: Scraped from <200 http://collegedunia.com/university/25563-manav-bharti-university-mbu-solan>
+{'about': u' ',
+ 'address': u'Village- Laddo, P.O. Sultanpur (Kumhar Hatti)    Solan - 173229    Himachal Pradesh ,    India',
+ 'founded_in': u' Estd 2009',
+ 'name': u'Manav Bharti University - [MBU], Solan',
+ 'status': u's',
+ 'website': u'http://www.manavbhartiuniversity.edu.in'}
+DEBUG: Scraped from <200 http://collegedunia.com/university/25787-lovely-professional-university-lpu-jalandhar>
+{'about': u',',
+ 'address': u'Near Chaheru Railway Station, Delhi-Jalandhar  G.T. Road, NH- 1, Phagwara    Jalandhar - 144411    Punjab ,    India',
+ 'founded_in': u' Estd 2005',
+ 'name': u'Lovely Professional University - [LPU], Jalandhar',
+ 'status': u's',
+ 'website': u'http://www.lpu.in'}
+DEBUG: Scraped from <200 http://collegedunia.com/university/25561-jaypee-university-of-information-technology-juit-solan>
+{'about': u' ',
+ 'address': u'Waknaghat, P. O. Waknaghat Teh Kandaghat, Distt. Solan    Solan - 173234    Himachal Pradesh ,    India',
+ 'founded_in': u' Estd 2002',
+ 'name': u'Jaypee University of Information Technology - [JUIT], Solan',
+ 'status': u's',
+ 'website': u'http://www.juit.ac.in'}
+INFO: Closing spider (finished)
+INFO: Dumping Scrapy stats:
+{'downloader/request_bytes': 1954,
+ 'downloader/request_count': 6,
+ 'downloader/request_method_count/GET': 6,
+ 'downloader/response_bytes': 252973,
+ 'downloader/response_count': 6,
+ 'downloader/response_status_count/200': 6,
+ 'finish_reason': 'finished',
+ 'finish_time': datetime.datetime(2016, 6, 18, 14, 35, 38, 407777),
+ 'item_scraped_count': 5,
+ 'log_count/DEBUG': 12,
+ 'log_count/INFO': 7,
+ 'log_count/WARNING': 1,
+ 'request_depth_max': 1,
+ 'response_received_count': 6,
+ 'scheduler/dequeued': 6,
+ 'scheduler/dequeued/memory': 6,
+ 'scheduler/enqueued': 6,
+ 'scheduler/enqueued/memory': 6,
+ 'start_time': datetime.datetime(2016, 6, 18, 14, 35, 37, 457625)}
+INFO: Spider closed (finished)
+INFO: Scrapy 1.0.5.post4+g4b324a8 started (bot: college_dunia)
+INFO: Optional features available: ssl, http11
+INFO: Overridden settings: {'NEWSPIDER_MODULE': 'college_dunia.spiders', 'SPIDER_MODULES': ['college_dunia.spiders'], 'BOT_NAME': 'college_dunia'}
+INFO: Enabled extensions: CloseSpider, TelnetConsole, LogStats, CoreStats, SpiderState
+INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, UserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+WARNING: /usr/lib/pymodules/python2.7/scrapy/pipelines/__init__.py:21: ScrapyDeprecationWarning: ITEM_PIPELINES defined as a list or a set is deprecated, switch to a dict
+  category=ScrapyDeprecationWarning, stacklevel=1)
+
+INFO: Enabled item pipelines: DBPipeline
+INFO: Spider opened
+INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+DEBUG: Telnet console listening on 127.0.0.1:6023
+DEBUG: Retrying <GET http://collegedunia.com/pharmacy/solan-colleges> (failed 1 times): 500 Internal Server Error
+DEBUG: Retrying <GET http://collegedunia.com/pharmacy/solan-colleges> (failed 2 times): 500 Internal Server Error
+DEBUG: Gave up retrying <GET http://collegedunia.com/pharmacy/solan-colleges> (failed 3 times): 500 Internal Server Error
+DEBUG: Crawled (500) <GET http://collegedunia.com/pharmacy/solan-colleges> (referer: None)
+DEBUG: Ignoring response <500 http://collegedunia.com/pharmacy/solan-colleges>: HTTP status code is not handled or not allowed
+INFO: Closing spider (finished)
+INFO: Dumping Scrapy stats:
+{'downloader/request_bytes': 756,
+ 'downloader/request_count': 3,
+ 'downloader/request_method_count/GET': 3,
+ 'downloader/response_bytes': 942,
+ 'downloader/response_count': 3,
+ 'downloader/response_status_count/500': 3,
+ 'finish_reason': 'finished',
+ 'finish_time': datetime.datetime(2016, 6, 19, 10, 56, 59, 207805),
+ 'log_count/DEBUG': 6,
+ 'log_count/INFO': 7,
+ 'log_count/WARNING': 1,
+ 'response_received_count': 1,
+ 'scheduler/dequeued': 3,
+ 'scheduler/dequeued/memory': 3,
+ 'scheduler/enqueued': 3,
+ 'scheduler/enqueued/memory': 3,
+ 'start_time': datetime.datetime(2016, 6, 19, 10, 56, 57, 821228)}
+INFO: Spider closed (finished)
+INFO: Scrapy 1.0.5.post4+g4b324a8 started (bot: college_dunia)
+INFO: Optional features available: ssl, http11
+INFO: Overridden settings: {'NEWSPIDER_MODULE': 'college_dunia.spiders', 'SPIDER_MODULES': ['college_dunia.spiders'], 'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter', 'LOGSTATS_INTERVAL': 0, 'BOT_NAME': 'college_dunia'}
+INFO: Enabled extensions: CloseSpider, TelnetConsole, CoreStats, SpiderState
+INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, UserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+WARNING: /usr/lib/pymodules/python2.7/scrapy/pipelines/__init__.py:21: ScrapyDeprecationWarning: ITEM_PIPELINES defined as a list or a set is deprecated, switch to a dict
+  category=ScrapyDeprecationWarning, stacklevel=1)
+
+INFO: Enabled item pipelines: DBPipeline
+DEBUG: Telnet console listening on 127.0.0.1:6023
+INFO: Spider opened
+DEBUG: Crawled (200) <GET http://collegedunia.com/> (referer: None)
+INFO: Scrapy 1.0.5.post4+g4b324a8 started (bot: college_dunia)
+INFO: Optional features available: ssl, http11
+INFO: Overridden settings: {'NEWSPIDER_MODULE': 'college_dunia.spiders', 'SPIDER_MODULES': ['college_dunia.spiders'], 'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter', 'LOGSTATS_INTERVAL': 0, 'BOT_NAME': 'college_dunia'}
+INFO: Enabled extensions: CloseSpider, TelnetConsole, CoreStats, SpiderState
+INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, UserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+WARNING: /usr/lib/pymodules/python2.7/scrapy/pipelines/__init__.py:21: ScrapyDeprecationWarning: ITEM_PIPELINES defined as a list or a set is deprecated, switch to a dict
+  category=ScrapyDeprecationWarning, stacklevel=1)
+
+INFO: Enabled item pipelines: DBPipeline
+DEBUG: Telnet console listening on 127.0.0.1:6024
+INFO: Spider opened
+DEBUG: Crawled (200) <GET http://www.htcampus.com/category/engineering-colleges-in-delhi-state/> (referer: None)
+INFO: Scrapy 1.0.5.post4+g4b324a8 started (bot: college_dunia)
+INFO: Optional features available: ssl, http11
+INFO: Overridden settings: {'NEWSPIDER_MODULE': 'college_dunia.spiders', 'SPIDER_MODULES': ['college_dunia.spiders'], 'DUPEFILTER_CLASS': 'scrapy.dupefilters.BaseDupeFilter', 'LOGSTATS_INTERVAL': 0, 'BOT_NAME': 'college_dunia'}
+INFO: Enabled extensions: CloseSpider, TelnetConsole, CoreStats, SpiderState
+INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, UserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+WARNING: /usr/lib/pymodules/python2.7/scrapy/pipelines/__init__.py:21: ScrapyDeprecationWarning: ITEM_PIPELINES defined as a list or a set is deprecated, switch to a dict
+  category=ScrapyDeprecationWarning, stacklevel=1)
+
+INFO: Enabled item pipelines: DBPipeline
+DEBUG: Telnet console listening on 127.0.0.1:6025
+INFO: Spider opened
+DEBUG: Crawled (200) <GET http://www.htcampus.com/college/manav-rachna-international-university-faculty-engineering-technology/> (referer: None)
