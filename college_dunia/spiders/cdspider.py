@@ -23,12 +23,12 @@ class XMLSpider(scrapy.Spider):
     name = "fxmlspider"
     allowed_domains = ["https://www.collegesearch.in", "collegesearch.in"]
 
-    start_urls = [ "https://www.collegesearch.in/Sitemap_cs_1.xml"]
+    start_urls = [ "https://www.collegesearch.in/Sitemap_cs_1.xml" , "https://www.collegesearch.in/Sitemap_cs_2.xml","https://www.collegesearch.in/Sitemap_cs_3.xml"]
 
     def parse(self, response):
         xxs = XmlXPathSelector(response = response)
         xxs.remove_namespaces()
-        for link in xxs.xpath("/urlset/url[1]/loc/text()"):
+        for link in xxs.xpath("/urlset/url/loc/text()"):
             l = link.extract()
             ls = l.split("/")[len(l.split("/")) - 1]
             if ls not in avoid:
@@ -45,8 +45,8 @@ class XMLSpider(scrapy.Spider):
         #l.add_xpath('facilities' , "//div[@class='facility']/span[@class='facility_name']/text()")
         #l.add_xpath("about","//div[@class='container-fluid about-article']//div[@class='content_p']/p[1]/text()")
         l.add_css('address' ,"div.font12:nth-child(2)::text")
-        yield scrapy.Request(response.urljoin(response.xpath("//a[@id='co2']/@href").extract()[0]))
-        yield l.load_item()
+        # yield scrapy.Request(response.urljoin(response.xpath("//a[@id='co2']/@href").extract()[0]))
+        return l.load_item()
 
     def parse_institute_course(self, response):
         l = ItemLoader(item = CourseName() , response = response)
