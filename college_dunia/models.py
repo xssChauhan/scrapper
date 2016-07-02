@@ -2,6 +2,7 @@ from sqlalchemy import create_engine , Column , Integer,Text , String , DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
 
 dbuser = "root"
 dbpass = "shikhar"
@@ -29,10 +30,18 @@ class Institutes(Base,Basest):
     id = Column(Integer , primary_key = True)
     name = Column(String)
     status = Column(String)
+    courses = relationship("InstituteCourses")
 
     @classmethod
     def likeAll(self,string,session):
         return session.query(self).filter(self.name.like("%" + string + "%")).all()
+
+    @property
+    def foo(self):
+        return self._foo
+    
+
+    
 
 
 
@@ -43,6 +52,11 @@ class InstitutesData(Institutes):
     founded_in = Column(String)
     about = Column(Text)
     address = Column(String)
+
+    @classmethod
+    def getFromURL(self,url,session):
+        return session.query(self).filter(self.website.like("%" + url + "%")).first()
+        
 
 class CourseNames(Base,Basest):
     __tablename__ = "course_names"
@@ -61,3 +75,24 @@ class Courses(Base,Basest):
     course_id = Column(Integer , ForeignKey("course_names.id"))
     level_id = Column(Integer , ForeignKey("course_levels.id"))
     duration = Column(String)
+    course = relationship("CourseNames")
+
+    @property
+    def getName(self):
+        return self.course.name
+
+    @property
+    def getFullName(self):
+        return self.course.fullname
+    
+    
+
+
+class InstituteCourses(Base, Basest):
+    __tablename__ = "institute_courses"
+    id = Column(Integer,primary_key = True)
+    inst_id = Column(Integer,ForeignKey("institutes.id"))
+    course_id = Column(Integer,ForeignKey("courses.id"))
+    seats = Column(Integer)
+    course = relationship("Courses")
+    institute = relationship("Institutes")

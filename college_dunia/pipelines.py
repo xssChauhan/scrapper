@@ -31,6 +31,9 @@ class BasePipeline():
         engine = db_connect()
         self.Session = scoped_session(sessionmaker(bind = engine ))
 
+    def makeSession(self):
+        return self.Session()
+
 class InstituteDBPipeline(BasePipeline):
     def process_item(self, item, spider):
         if isinstance(item , InstituteItem):
@@ -39,6 +42,7 @@ class InstituteDBPipeline(BasePipeline):
             match =  closestMatch(item.get('name') , session )
             if match.get('s') > 50 and match.get('d') is not None:
                 print "Ignoring " + item.get('name') + " as a match was found in " + match.get('d').name
+                
             else:
                 print("Adding To Database" + item.get('name'))
                 try:
@@ -51,3 +55,10 @@ class InstituteDBPipeline(BasePipeline):
                     session.close()
 
             return item
+
+#Process course items here
+class InstituteCourseDBPipeline(BasePipeline):
+    def process_item(self,item,spider):
+        if isinstance(item,CourseItem):
+            pass
+            

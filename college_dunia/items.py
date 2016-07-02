@@ -36,8 +36,16 @@ class InstituteItem(Item):
                 output_processor = Join()
     )
 
-class CourseName(Item):
+class CourseItem(Item):
     name = Field()
+    level = Field()
+    duration = Field()
+    subcourses = Field()
+    seats = Field()
+    fees = Field()
 
 class CourseLevel(Item):
+    name = Field()
+
+class SubcourseItem(Item):
     name = Field()

@@ -1,10 +1,14 @@
 import scrapy
 from scrapy.loader import ItemLoader
-from college_dunia.items import InstituteItem
+from college_dunia.items import InstituteItem, CourseItem
 from scrapy.selector import XmlXPathSelector
-
+from college_dunia.models import InstitutesData
+from college_dunia.pipelines import closestMatch, BasePipeline
 import logging
 from scrapy.utils.log import configure_logging
+
+b = BasePipeline()
+session = b.makeSession()
 
 configure_logging(install_root_handler=False)
 logging.basicConfig(
@@ -20,35 +24,47 @@ def addCourseRequest(url):
     yield scrapy.Request(url , self.parse_institute_course)
 
 class XMLSpider(scrapy.Spider):
-    name = "fxmlspider"
-    allowed_domains = ["https://www.collegesearch.in", "collegesearch.in"]
+    name = "cdspider"
+    allowed_domains = ["https://www.collegedunia.com", "collegedunia.com"]
 
-    start_urls = [ "https://www.collegesearch.in/Sitemap_cs_1.xml" , "https://www.collegesearch.in/Sitemap_cs_2.xml","https://www.collegesearch.in/Sitemap_cs_3.xml"]
+    start_urls = ["http://collegedunia.com/engineering-colleges?ajax=1&page="+str(i) for i in range(1,2)]
 
+    def courseLoader(self,response):
+        c = ItemLoader( item = CourseItem() , response = response )
+        c.add_xpath("name" , "//span[@class='course_name']/text()")
+        c.add_xpath("seats" , "//span[@class='course_info seats']/text()")
+        c.add_xpath("fees" ,"//span[@class='fees']/text()")
+
+        print c.load_item()
+
+        
     def parse(self, response):
-        xxs = XmlXPathSelector(response = response)
-        xxs.remove_namespaces()
-        for link in xxs.xpath("/urlset/url/loc/text()"):
-            l = link.extract()
-            ls = l.split("/")[len(l.split("/")) - 1]
-            if ls not in avoid:
-                l = response.urljoin(link.extract())
-                if ls != "courses":
-                    yield scrapy.Request(l , self.parse_institute)
+        for link in response.xpath("//div[@class='college_info']/a/@href").extract():
+            yield scrapy.Request(link , self.parse_institute)
+            #yield scrapy.Request(link + "/courses-fees" , callback = self.parse_institute_course )
 
     def parse_institute(self,response):
         l = ItemLoader(item = InstituteItem() , response = response)
-        l.add_css( 'name' , "h3.clg-name-head strong::text" )
-        l.add_value('status' , "s")
-        l.add_css("website" , "div.col-md-4:nth-child(3) > div:nth-child(1) > span:nth-child(3)::text" )
-        #l.add_xpath('founded_in' , "//div[@class='college_data']/div[@class='extra_info']/span[last()]/text()")
-        #l.add_xpath('facilities' , "//div[@class='facility']/span[@class='facility_name']/text()")
-        #l.add_xpath("about","//div[@class='container-fluid about-article']//div[@class='content_p']/p[1]/text()")
-        l.add_css('address' ,"div.font12:nth-child(2)::text")
-        # yield scrapy.Request(response.urljoin(response.xpath("//a[@id='co2']/@href").extract()[0]))
-        return l.load_item()
+        l.add_xpath( 'name' , "//h1[@class='college_name']/text()")
+        l.add_value( 'status' , "s")
+        l.add_xpath( "website" , '//*[@id="renderTabData"]/div[15]/div/div/div[1]/div/div[3]/div/p/a/@href')
+        l.add_xpath('address' ,'//*[@id="renderTabData"]/div[15]/div/div/div[1]/div/div[1]/div[1]/h3/text()')
+        link = response.url + "/courses-fees"
+        a = l.load_item()
+        yield scrapy.Request(link, callback = self.parse_institute_course , meta = {"college":a})
+        yield a
 
     def parse_institute_course(self, response):
-        l = ItemLoader(item = CourseName() , response = response)
-        l.add_css("name" , "div.col-xs-5:nth-child(2) > p:nth-child(1) > strong:nth-child(1)::text")
-        l.load_item()
+        instituteItem = response.meta.get('college')
+        college = InstitutesData(**instituteItem)
+        matchInstitute = closestMatch(instituteItem.get('name'),session).get('d')
+
+        #load the courses
+        for part in response.xpath("//div[@class='content_body course_snipp_body']").extract():
+            course = self.courseLoader(part)
+
+
+        #Check if this course is added to this college in our database
+        
+        
+        
