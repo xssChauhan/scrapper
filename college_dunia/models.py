@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
 dbuser = "root"
-dbpass = "shikhar"
+dbpass = ""
 dbhost = "localhost"
 dbname = "edunuts_beta"
 

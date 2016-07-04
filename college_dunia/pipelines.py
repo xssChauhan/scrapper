@@ -59,6 +59,7 @@ class InstituteDBPipeline(BasePipeline):
 #Process course items here
 class InstituteCourseDBPipeline(BasePipeline):
     def process_item(self,item,spider):
+        print "Calling IC pipeline"
         if isinstance(item,CourseItem):
-            pass
+            print item
             

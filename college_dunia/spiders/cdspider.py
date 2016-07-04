@@ -4,9 +4,10 @@ from college_dunia.items import InstituteItem, CourseItem
 from scrapy.selector import XmlXPathSelector
 from college_dunia.models import InstitutesData
 from college_dunia.pipelines import closestMatch, BasePipeline
+from college_dunia.helpers import DateParse, newResponse
 import logging
 from scrapy.utils.log import configure_logging
-
+from datetime import datetime
 b = BasePipeline()
 session = b.makeSession()
 
@@ -23,7 +24,7 @@ avoid = ["rankings" , "gallery" , "contact"]
 def addCourseRequest(url):
     yield scrapy.Request(url , self.parse_institute_course)
 
-class XMLSpider(scrapy.Spider):
+class CDSpider(scrapy.Spider):
     name = "cdspider"
     allowed_domains = ["https://www.collegedunia.com", "collegedunia.com"]
 
@@ -60,11 +61,13 @@ class XMLSpider(scrapy.Spider):
         matchInstitute = closestMatch(instituteItem.get('name'),session).get('d')
 
         #load the courses
-        for part in response.xpath("//div[@class='content_body course_snipp_body']").extract():
-            course = self.courseLoader(part)
-
-
-        #Check if this course is added to this college in our database
+        for part in response.xpath("//div[@class='course_snipp_body']").extract():
+            newR = newResponse(response,part)
+            l = ItemLoader(item = CourseItem() , response = newR)
+            l.add_xpath("name" , "//a[@class='course_name']/text()")
+            l.add_xpath("duration","//span[@class='course_info duration-yr']/text()")
+            a =  l.load_item()
+            print a
         
         
         

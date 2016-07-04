@@ -9,6 +9,7 @@ from scrapy import Field,Item
 from scrapy.loader.processors import Join, MapCompose, TakeFirst, Compose
 from w3lib.html import remove_tags
 import re
+from college_dunia.helpers import getYears
 
 def enter_filter(item):
     return item.replace("\n"," ")
@@ -37,12 +38,14 @@ class InstituteItem(Item):
     )
 
 class CourseItem(Item):
-    name = Field()
-    level = Field()
-    duration = Field()
-    subcourses = Field()
-    seats = Field()
-    fees = Field()
+    name = Field(output_processor = Join())
+    #level = Field()
+    duration = Field(
+        input_processor = getYears,
+        output_processor = Join() )
+    # subcourses = Field()
+    # seats = Field()
+    # fees = Field()
 
 class CourseLevel(Item):
     name = Field()

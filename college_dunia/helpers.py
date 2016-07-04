@@ -1,3 +1,5 @@
+import datetime
+import re
 def closestMatch(s , obj , session , attr = "name"):
     match = {
         "s" : 0,
@@ -15,3 +17,40 @@ def closestMatch(s , obj , session , attr = "name"):
                     match['s'] , match['p'] = score
                     match['d'] = t
     return match
+
+def newResponse(response , body):
+    r = response.copy()
+    return r.replace(body = body)
+
+def getYears(text):
+    return re.findall("\d",text[0])[0]
+
+class DateParse():
+
+    def __init__(self , year , month = 1, day= 1, hours =  0, minutes = 0 , seconds = 0):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hour = hours
+        self.minute = minutes
+        self.second = seconds
+
+        self._date = datetime.datetime(year = self.year , month = self.month , day = self.day )
+        self.date = str(self._date)
+    
+    @property
+    def dateRepr(self):
+        return str(self._date)
+    
+    def replaceDays(self):
+        pattern = "-\d{2} "
+        self.date = re.sub(pattern,"-00 ",self.date)
+        return self
+
+    def replaceMonths(self):
+        pattern = "-\d{2}-"
+        self.date = re.sub(pattern,"-00-",self.date)
+        return self
+
+    def getDate(self):
+        return self.replaceDays().replaceMonths().date
