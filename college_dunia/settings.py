@@ -16,4 +16,4 @@ NEWSPIDER_MODULE = 'college_dunia.spiders'
 
 LOG_LEVEL = 'INFO'
 
-ITEM_PIPELINES = ['college_dunia.pipelines.InstituteDBPipeline']
+ITEM_PIPELINES = ['college_dunia.pipelines.InstituteDBPipeline' , "college_dunia.pipelines.InstituteCourseDBPipeline"]

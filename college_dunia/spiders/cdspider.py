@@ -38,7 +38,7 @@ class CDSpider(scrapy.Spider):
 
         print c.load_item()
 
-        
+
     def parse(self, response):
         for link in response.xpath("//div[@class='college_info']/a/@href").extract():
             yield scrapy.Request(link , self.parse_institute)
@@ -66,8 +66,6 @@ class CDSpider(scrapy.Spider):
             l = ItemLoader(item = CourseItem() , response = newR)
             l.add_xpath("name" , "//a[@class='course_name']/text()")
             l.add_xpath("duration","//span[@class='course_info duration-yr']/text()")
-            a =  l.load_item()
-            print a
-        
-        
-        
+            l.add_xpath("subcourses","//a[@class='stream_tag']/text()")
+            l.add_xpath("fees","//span[@class='fees']/text()")
+            yield l.load_item()

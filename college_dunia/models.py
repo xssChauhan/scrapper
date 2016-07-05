@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 
 dbuser = "root"
-dbpass = ""
+dbpass = "shikhar"
 dbhost = "localhost"
 dbname = "edunuts_beta"
 
@@ -39,9 +39,9 @@ class Institutes(Base,Basest):
     @property
     def foo(self):
         return self._foo
-    
 
-    
+
+
 
 
 
@@ -56,7 +56,7 @@ class InstitutesData(Institutes):
     @classmethod
     def getFromURL(self,url,session):
         return session.query(self).filter(self.website.like("%" + url + "%")).first()
-        
+
 
 class CourseNames(Base,Basest):
     __tablename__ = "course_names"
@@ -84,8 +84,8 @@ class Courses(Base,Basest):
     @property
     def getFullName(self):
         return self.course.fullname
-    
-    
+
+
 
 
 class InstituteCourses(Base, Basest):

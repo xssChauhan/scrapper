@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models import InstitutesData , db_connect , Institutes
-from college_dunia.items import InstituteItem
+from college_dunia.items import InstituteItem, CourseItem
 from fuzzywuzzy.fuzz import token_sort_ratio as tsor , partial_ratio as pr
 import re
 # Define your item pipelines here
@@ -14,7 +14,7 @@ def closestMatch(s,session):
         "s" : 0,
     }
     toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
-        
+
 
     for e in xrange(len(toMatch)//2 - 1,len(toMatch)):
         i = Institutes.likeAll(toMatch[e],session)
@@ -42,7 +42,7 @@ class InstituteDBPipeline(BasePipeline):
             match =  closestMatch(item.get('name') , session )
             if match.get('s') > 50 and match.get('d') is not None:
                 print "Ignoring " + item.get('name') + " as a match was found in " + match.get('d').name
-                
+
             else:
                 print("Adding To Database" + item.get('name'))
                 try:
@@ -59,7 +59,6 @@ class InstituteDBPipeline(BasePipeline):
 #Process course items here
 class InstituteCourseDBPipeline(BasePipeline):
     def process_item(self,item,spider):
-        print "Calling IC pipeline"
+        print "Calling IC pipeline" , item
         if isinstance(item,CourseItem):
             print item
-            

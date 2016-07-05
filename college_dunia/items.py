@@ -43,9 +43,9 @@ class CourseItem(Item):
     duration = Field(
         input_processor = getYears,
         output_processor = Join() )
-    # subcourses = Field()
+    subcourses = Field()
     # seats = Field()
-    # fees = Field()
+    fees = Field()
 
 class CourseLevel(Item):
     name = Field()
