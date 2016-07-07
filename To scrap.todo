@@ -1,12 +1,7 @@
-Information of College:
-
-☐ Name
-☐ Phone
-☐ Facilities
-☐ Founded In
-☐ Location [ Address ]
-☐ Website
-☐ Courses
-☐ Companies for Placement
-☐ About the college
-☐ Nearby Colleges
+Course Matching:
+ ☐ Match Name and Abbreviation
+     ✔ Find all the matching ones @done (16-07-07 01:59)
+     ☐ Return the course that is not available
+       ☐ Add this course to Database and all its subcourses
+     ☐ Find all the Matching the subcourses
+     ☐ Return the subcourses that arent added in a course

@@ -3,13 +3,12 @@ from scrapy.loader import ItemLoader
 from college_dunia.items import InstituteItem, CourseItem
 from scrapy.selector import XmlXPathSelector
 from college_dunia.models import InstitutesData
-from college_dunia.pipelines import closestMatch, BasePipeline
+from college_dunia.pipelines import closestMatch, BasePipeline,session
 from college_dunia.helpers import DateParse, newResponse
 import logging
 from scrapy.utils.log import configure_logging
 from datetime import datetime
-b = BasePipeline()
-session = b.makeSession()
+
 
 configure_logging(install_root_handler=False)
 logging.basicConfig(
@@ -28,8 +27,10 @@ class CDSpider(scrapy.Spider):
     name = "cdspider"
     allowed_domains = ["https://www.collegedunia.com", "collegedunia.com"]
 
-    start_urls = ["http://collegedunia.com/engineering-colleges?ajax=1&page="+str(i) for i in range(1,2)]
+    engg = ["http://collegedunia.com/engineering-colleges?ajax=1&page="+str(i) for i in xrange(1,379)]
+    comm = ["http://collegedunia.com/commerce-colleges?ajax=1&page="+str(i) for i in xrange(1,270)]
 
+    start_urls = engg + comm
     def courseLoader(self,response):
         c = ItemLoader( item = CourseItem() , response = response )
         c.add_xpath("name" , "//span[@class='course_name']/text()")
@@ -58,7 +59,7 @@ class CDSpider(scrapy.Spider):
     def parse_institute_course(self, response):
         instituteItem = response.meta.get('college')
         college = InstitutesData(**instituteItem)
-        matchInstitute = closestMatch(instituteItem.get('name'),session).get('d')
+        matchInstitute = closestMatch(instituteItem.get('name')).get('d')
 
         #load the courses
         for part in response.xpath("//div[@class='course_snipp_body']").extract():
@@ -67,5 +68,7 @@ class CDSpider(scrapy.Spider):
             l.add_xpath("name" , "//a[@class='course_name']/text()")
             l.add_xpath("duration","//span[@class='course_info duration-yr']/text()")
             l.add_xpath("subcourses","//a[@class='stream_tag']/text()")
-            l.add_xpath("fees","//span[@class='fees']/text()")
-            yield l.load_item()
+            l.add_xpath("fee","//span[@class='fees']/text()")
+            l.add_value("institute",{"i" : matchInstitute })
+            a = l.load_item()
+            yield a

@@ -39,13 +39,23 @@ class InstituteItem(Item):
 
 class CourseItem(Item):
     name = Field(output_processor = Join())
-    #level = Field()
     duration = Field(
         input_processor = getYears,
         output_processor = Join() )
     subcourses = Field()
-    # seats = Field()
-    fees = Field()
+    fee = Field()
+    institute = Field()
+
+    def extractAbbr(self):
+        return re.findall("\[([\w.()]+)\]",self.get('name'))
+    def extractFullName(self):
+        toReplace = self.extractAbbr()
+        name = self.get('name')
+        
+        for e in toReplace:
+            name = name.replace("["+str(e)+"]","")
+        return name
+
 
 class CourseLevel(Item):
     name = Field()

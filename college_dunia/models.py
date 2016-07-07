@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine , Column , Integer,Text , String , DateTime,ForeignKey
+from sqlalchemy import or_,create_engine , Column , Integer,Text , String , DateTime,ForeignKey,and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declared_attr
@@ -36,10 +36,6 @@ class Institutes(Base,Basest):
     def likeAll(self,string,session):
         return session.query(self).filter(self.name.like("%" + string + "%")).all()
 
-    @property
-    def foo(self):
-        return self._foo
-
 
 
 
@@ -58,6 +54,12 @@ class InstitutesData(Institutes):
         return session.query(self).filter(self.website.like("%" + url + "%")).first()
 
 
+    
+class Subcourses(Base,Basest):
+    __tablename__ = "subcourses"
+    id = Column(Integer,primary_key = True)
+    name = Column(String)
+
 class CourseNames(Base,Basest):
     __tablename__ = "course_names"
     id = Column(Integer , primary_key = True)
@@ -73,9 +75,12 @@ class Courses(Base,Basest):
     __tablename__ = "courses"
     id = Column(Integer , primary_key = True)
     course_id = Column(Integer , ForeignKey("course_names.id"))
-    level_id = Column(Integer , ForeignKey("course_levels.id"))
+    level_id = Column(Integer , ForeignKey("course_levels.id")) 
+    subcourse_id = Column(Integer,ForeignKey("subcourses.id"))
     duration = Column(String)
     course = relationship("CourseNames")
+    subcourse = relationship("Subcourses")
+    
 
     @property
     def getName(self):
@@ -84,6 +89,15 @@ class Courses(Base,Basest):
     @property
     def getFullName(self):
         return self.course.fullname
+    @property
+    def getSubcourse(self):
+        return self.subcourse.name
+    
+
+
+
+ 
+    
 
 
 
@@ -94,5 +108,19 @@ class InstituteCourses(Base, Basest):
     inst_id = Column(Integer,ForeignKey("institutes.id"))
     course_id = Column(Integer,ForeignKey("courses.id"))
     seats = Column(Integer)
-    course = relationship("Courses")
+    fee = Column(Integer)
+    duration = Column(String)
+    course = relationship("Courses",backref="institutes")
     institute = relationship("Institutes")
+    
+    @classmethod
+    def courseInInstitute(self,fullname,abbr,session):
+        results = session.query(self,Courses).join(self.institute).join(self.course).join(Courses.course).filter(and_(CourseNames.name.like("%"+abbr+"%"),CourseNames.fullname.like("%"+ fullname +"%"))).all()
+        return iter([ e[1] for e in results ])
+
+class CrawlChange(Base):
+    __tablename__ = "crawl_changed"
+    id = Column(Integer,primary_key = True)
+    table_name = Column(String)
+    entity = Column(String)
+    modification = Column(String)
