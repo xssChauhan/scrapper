@@ -4,6 +4,7 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 from sqlalchemy import Table
+
 dbuser = "root"
 dbpass = "shikhar"
 dbhost = "localhost"
@@ -48,6 +49,9 @@ institute_facilities = Table("institute_facilities",Base.metadata,
     Column("inst_id",Integer,ForeignKey("institutes.id")),
     Column("fac_id",Integer,ForeignKey("facilities.facility_id")))
 
+institute_companies = Table("institute_companies",Base.metadata,
+    Column("inst_id",Integer,ForeignKey("institutes.id")),
+    Column("company_id",Integer,ForeignKey("companies.company_id")))
 
 class InstitutesData(Institutes):
     __tablename__ = "institutes_data"
@@ -56,29 +60,31 @@ class InstitutesData(Institutes):
     founded_in = Column(String)
     about = Column(Text)
     address = Column(String)
-    facilities = relationship("Facilities",secondary = institute_facilities)
+    facilities = relationship("Facilities",secondary = institute_facilities,backref="institutes")
+    companies = relationship("Companies",secondary = institute_companies,backref="institutes")
 
     @classmethod
     def getFromURL(self,url,session):
         return session.query(self).filter(self.website.like("%" + url + "%")).first()
 
-    def setFacilities(self,session,facilities):
+    def setFacilities(self,session,facilities = []):
+        print "Adding Facilities"
         for e in facilities:
             fac = session.query(Facilities).filter(Facilities.facility_name.like("%"+str(e)+"%")).first()
             if fac is not None:
                 self.facilities.append(fac)
+        return self
 
-    def setCompanies(self,session,companies):
-        # for e in companies:
-        #     com = session.query(Companies).filter(Companies.company_name.like("%"+str(e)+"%")).first()
-        #     if com is not None:
-        #         instC = InstitutesCompanies()
-        #         instC.company = com
-        #         self.companies.append(instC)
-        pass
+    def setCompanies(self,session,companies = []):
+        print "Adding Companies"
+        for e in companies:
+            com = session.query(Companies).filter(Companies.company_name.like("%"+str(e)+"%")).first()
+            if com is not None:
+                self.companies.append(com)
+        return self
 
 
-    
+
 class Subcourses(Base,Basest):
     __tablename__ = "subcourses"
     id = Column(Integer,primary_key = True)
@@ -99,12 +105,12 @@ class Courses(Base,Basest):
     __tablename__ = "courses"
     id = Column(Integer , primary_key = True)
     course_id = Column(Integer , ForeignKey("course_names.id"))
-    level_id = Column(Integer , ForeignKey("course_levels.id")) 
+    level_id = Column(Integer , ForeignKey("course_levels.id"))
     subcourse_id = Column(Integer,ForeignKey("subcourses.id"))
     duration = Column(String)
     course = relationship("CourseNames")
     subcourse = relationship("Subcourses")
-    
+
 
     @property
     def getName(self):
@@ -116,14 +122,6 @@ class Courses(Base,Basest):
     @property
     def getSubcourse(self):
         return self.subcourse.name
-    
-
-
-
- 
-    
-
-
 
 
 class InstituteCourses(Base, Basest):
@@ -136,7 +134,7 @@ class InstituteCourses(Base, Basest):
     duration = Column(String)
     course = relationship("Courses",backref="institutes")
     institute = relationship("Institutes")
-    
+
     @classmethod
     def courseInInstitute(self,fullname,abbr,session):
         results = session.query(self,Courses).join(self.institute).join(self.course).join(Courses.course).filter(and_(CourseNames.name.like("%"+abbr+"%"),CourseNames.fullname.like("%"+ fullname +"%"))).all()
@@ -158,7 +156,7 @@ class Facilities(Base):
     @property
     def name(self):
         return self.facility_name
-    
+
 
 
 class Companies(Base):
@@ -170,21 +168,3 @@ class Companies(Base):
     @property
     def name(self):
         return self.company_name
-    
-class InstituteCompanies(Base):
-    __tablename__ = "institute_companies"
-    inst_company_id = Column(Integer,primary_key = True)
-    inst_id = Column(Integer,ForeignKey("institutes.id"))
-    company_id = Column(Integer,ForeignKey("companies.company_id"))
-    institute = relationship("Institutes",backref = "companies")
-    company = relationship("Companies",backref = "institutes")
-
-    @property
-    def id(self):
-        return self.inst_company_id
-    
-    def getCompanyName(self):
-        return self.company.name
-
-    def getInstituteName(self):
-        return self.institute.name    

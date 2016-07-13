@@ -26,8 +26,6 @@ def closestMatch(s):
         "s" : 0,
     }
     toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
-
-
     for e in xrange(len(toMatch)//2 - 1,len(toMatch)):
         i = InstitutesData.likeAll(toMatch[e],session)
         for t in i:
@@ -39,7 +37,7 @@ def closestMatch(s):
 
 def courseClosestMatch(abbr,fullname,subcourse = ""):
     match = {
-        "s" : 0, 
+        "s" : 0,
     }
     s = abbr + " " + fullname
     toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
@@ -58,7 +56,7 @@ def addCourseToInstitute(inst,course, **kwargs):
         ic = InstituteCourses(**kwargs)
         ic.course = course
         inst.courses.append(ic)
-        
+
         session.commit()
         session.add(CrawlChange(table_name = ic.__tablename__ , modification = "new" , entity = ic.id))
         session.commit()
@@ -71,20 +69,25 @@ def addCourseToInstitute(inst,course, **kwargs):
 
 
 def makeInstituteObject(item):
-    i = InstitutesData()
-    for e in [x for x in dir(i) if not i.startswith("__") and x !="metadata" and x !="facilities" and x != "companies" and not inspect.ismethod(getattr(i,x))]:
-        setattr(i,e,item.get(e))
-    return i 
+    try:
+        i = InstitutesData()
+        for e in [x for x in dir(i) if not x.startswith("__") and not x.startswith("_") and x !="metadata" and x !="facilities" and x != "companies" and not inspect.ismethod(getattr(i,x))]:
+            if item.get(e) is not None:
+                setattr(i,e,item.get(e))
+                print e
+        return i
+    except Exception as e:
+        print "Error while making object ",e
 class InstituteDBPipeline(BasePipeline):
     def process_item(self, item, spider):
         if isinstance(item , InstituteItem):
             match =  closestMatch(item.get('name') )
             if match.get('s') > 50 and match.get('d') is not None:
-                #Process the institute and find the data that is missing in our database from the scraped page and add it to the database 
+                #Process the institute and find the data that is missing in our database from the scraped page and add it to the database
                 #processing the facilities and companies for now
                 institute = match.get('d')
-                print institute.setFacilities
-                institute.setFacilities(session,item.get('facilities'))
+                institute.setFacilities(session,item.get('facilities')).setCompanies(session,item.get('companies'))
+                institute.website = item.get('website')
                 try:
                     session.commit()
                 except:
@@ -94,18 +97,17 @@ class InstituteDBPipeline(BasePipeline):
                 try:
                     institute = makeInstituteObject(item)
                     session.add(institute)
-                    session.commit()
                     institute.setFacilities(session,item.get('facilities'))
-                    institute.setCompanies(session,item.get('companies'))
+                    session.commit()
                     session.add(CrawlChange(table_name = institute.__tablename__,modification = "new",entity = institute.id))
                     session.commit()
                 except Exception as e:
-                    print "Error while adding institute to database ",e
+                    print "From InstituteDBPipeline : Error while adding institute to database : ",e
                     session.rollback()
             return item
 
         if isinstance(item,CourseItem):
-            inst = item['institute'][0].get("i")
+            inst = item['institute'][0].get("i"
             inst = session.query(InstitutesData).get(inst.id)
             if len(inst.courses)  == 0:
                 #Add the course to Database
@@ -122,5 +124,3 @@ class InstituteDBPipeline(BasePipeline):
                     match = courseClosestMatch(str(course_abbr),course_full_name).get('d')
                     addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).replaceDays().replaceMonths().getDate() , fee = item.get("fees"))
                 return item
-
-

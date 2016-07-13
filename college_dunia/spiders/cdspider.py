@@ -32,7 +32,7 @@ class CDSpider(scrapy.Spider):
     arts = ["http://collegedunia.com/art-colleges?ajax=1&page="+str(i) for i in xrange(1,320)]
     medical = ["http://collegedunia.com/medical-colleges?ajax=1&page="+str(i) for i in xrange(1,98)]
     management = ["http://collegedunia.com/management-colleges?ajax=1&page="+str(i) for i in xrange(1,449)]
-    start_urls = medical + arts + comm   
+    start_urls = medical + arts + comm
     def courseLoader(self,response):
         c = ItemLoader( item = CourseItem() , response = response )
         c.add_xpath("name" , "//span[@class='course_name']/text()")
@@ -51,8 +51,8 @@ class CDSpider(scrapy.Spider):
         l = ItemLoader(item = InstituteItem() , response = response)
         l.add_xpath( 'name' , "//h1[@class='college_name']/text()")
         l.add_value( 'status' , "s")
-        l.add_xpath( "website" , '//*[@id="renderTabData"]/div[15]/div/div/div[1]/div/div[3]/div/p/a/@href')
-        l.add_xpath('address' ,'//*[@id="renderTabData"]/div[15]/div/div/div[1]/div/div[1]/div[1]/h3/text()')
+        l.add_xpath( "website" , "//div[@class='web_block']//p[@class='lr_detail']/a/@href")
+        l.add_xpath('address' ,'//div[@class="loc_block"]//h3/text()')
         l.add_xpath('facilities',"//span[@class='facility_name']/text()")
         link = response.url + "/courses-fees"
         a = l.load_item()
@@ -61,12 +61,8 @@ class CDSpider(scrapy.Spider):
 
     def parse_institute_course(self, response):
         instituteItem = response.meta.get('college')
-        print instituteItem
-        try:
-            college = InstitutesData(**instituteItem)
-        except:
-            pass
         matchInstitute = closestMatch(instituteItem.get('name')).get('d')
+        if matchInstitute is None : print "From Pipeline , Match institute", matchInstitute," ", instituteItem.get("name")
 
         #load the courses
         for part in response.xpath("//div[@class='course_snipp_body']").extract():

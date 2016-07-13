@@ -7,7 +7,7 @@ def closestMatch(s , obj , session , attr = "name"):
         "p" : 0
     }
     toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
-        
+
 
     for e in xrange(len(toMatch)//2 - 1,len(toMatch)):
         i = obj.likeAll(toMatch[e],attr,session)
@@ -32,20 +32,19 @@ def getYears(text):
 class DateParse():
 
     def __init__(self , year , month = 1, day= 1, hours =  0, minutes = 0 , seconds = 0):
-        self.year = year
-        self.month = month
-        self.day = day
-        self.hour = hours
-        self.minute = minutes
-        self.second = seconds
-
+        self.year = int(year)
+        self.month = int(month)
+        self.day = int(day)
+        self.hour = int(hours)
+        self.minute = int(minutes)
+        self.second = int(seconds)
         self._date = datetime.datetime(year = self.year , month = self.month , day = self.day )
         self.date = str(self._date)
-    
+
     @property
     def dateRepr(self):
         return str(self._date)
-    
+
     def replaceDays(self):
         pattern = "-\d{2} "
         self.date = re.sub(pattern,"-00 ",self.date)
