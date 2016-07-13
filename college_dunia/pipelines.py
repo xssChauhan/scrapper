@@ -90,6 +90,7 @@ class InstituteDBPipeline(BasePipeline):
                 institute.website = item.get('website')
                 try:
                     session.commit()
+                    session.add(CrawlChange(table_name = institute.__tablename__,modification = "changed", entity = institute.id))
                 except:
                     session.rollback()
             else:
