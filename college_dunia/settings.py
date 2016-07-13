@@ -13,7 +13,7 @@ BOT_NAME = 'college_dunia'
 USER_AGENT = "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
 SPIDER_MODULES = ['college_dunia.spiders']
 NEWSPIDER_MODULE = 'college_dunia.spiders'
-
+CONCURRENT_REQUESTS = 100
 LOG_LEVEL = 'INFO'
 
 ITEM_PIPELINES = {'college_dunia.pipelines.InstituteDBPipeline' : 1 }

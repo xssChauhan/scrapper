@@ -40,7 +40,7 @@ class Institutes(Base,Basest):
 
     @classmethod
     def likeAll(self,string,session):
-        return session.query(self).filter(self.name.like("%" + string + "%")).all()
+        return session.query(self).filter(self.name.like("%" + str(string) + "%")).all()
 
 
 
