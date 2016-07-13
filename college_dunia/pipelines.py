@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import or_
-from models import InstitutesData , db_connect , Institutes,Courses,CourseNames, Subcourses, InstituteCourses,CrawlChange
+from models import *
 from college_dunia.items import InstituteItem, CourseItem
 from fuzzywuzzy.fuzz import token_sort_ratio as tsor , partial_ratio as pr
-import re
+import re,inspect
 from scrapy.exceptions import DropItem
+from .helpers import DateParse
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
@@ -28,7 +29,7 @@ def closestMatch(s):
 
 
     for e in xrange(len(toMatch)//2 - 1,len(toMatch)):
-        i = Institutes.likeAll(toMatch[e],session)
+        i = InstitutesData.likeAll(toMatch[e],session)
         for t in i:
             score = tsor(s,t.name)
             if score > match['s']:
@@ -69,33 +70,43 @@ def addCourseToInstitute(inst,course, **kwargs):
     return 1
 
 
-
+def makeInstituteObject(item):
+    i = InstitutesData()
+    for e in [x for x in dir(i) if not i.startswith("__") and x !="metadata" and x !="facilities" and x != "companies" and not inspect.ismethod(getattr(i,x))]:
+        setattr(i,e,item.get(e))
+    return i 
 class InstituteDBPipeline(BasePipeline):
     def process_item(self, item, spider):
         if isinstance(item , InstituteItem):
-            institute = InstitutesData(**item)
             match =  closestMatch(item.get('name') )
             if match.get('s') > 50 and match.get('d') is not None:
-                #print "Ignoring " + item.get('name') + " as a match was found in " + match.get('d').name
-                pass
-            else:
-                print("Adding To Database" + item.get('name'))
+                #Process the institute and find the data that is missing in our database from the scraped page and add it to the database 
+                #processing the facilities and companies for now
+                institute = match.get('d')
+                print institute.setFacilities
+                institute.setFacilities(session,item.get('facilities'))
                 try:
+                    session.commit()
+                except:
+                    session.rollback()
+            else:
+                print "Adding To Database" + item.get('name')
+                try:
+                    institute = makeInstituteObject(item)
                     session.add(institute)
                     session.commit()
+                    institute.setFacilities(session,item.get('facilities'))
+                    institute.setCompanies(session,item.get('companies'))
                     session.add(CrawlChange(table_name = institute.__tablename__,modification = "new",entity = institute.id))
                     session.commit()
                 except Exception as e:
                     print "Error while adding institute to database ",e
                     session.rollback()
-                    raise
-                finally:
-                    session.close()
-
             return item
 
         if isinstance(item,CourseItem):
             inst = item['institute'][0].get("i")
+            inst = session.query(InstitutesData).get(inst.id)
             if len(inst.courses)  == 0:
                 #Add the course to Database
                 course_abbr = item.extractAbbr()
@@ -106,10 +117,10 @@ class InstituteDBPipeline(BasePipeline):
                 if item.get('subcourses') is not None:
                     for s in item.get('subcourses'):
                         match = courseClosestMatch(str(course_abbr),course_full_name,str(s)).get('d')
-                        addCourseToInstitute(inst,match,duration = item.get("duration") , fee = item.get("fees") )
+                        addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).replaceDays().replaceMonths().getDate() , fee = item.get("fees") )
                 else:
                     match = courseClosestMatch(str(course_abbr),course_full_name).get('d')
-                    addCourseToInstitute(inst,match,duration = item.get("duration") , fee = item.get("fees"))
+                    addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).replaceDays().replaceMonths().getDate() , fee = item.get("fees"))
                 return item
 
 
