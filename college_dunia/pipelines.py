@@ -86,7 +86,7 @@ class InstituteDBPipeline(BasePipeline):
                 #Process the institute and find the data that is missing in our database from the scraped page and add it to the database
                 #processing the facilities and companies for now
                 institute = match.get('d')
-                institute.setFacilities(session,item.get('facilities')).setCompanies(session,item.get('companies'))
+                institute.setFacilities(session,item.get('facilities') or []).setCompanies(session,item.get('companies') or [])
                 institute.website = item.get('website')
                 try:
                     session.commit()
@@ -107,7 +107,7 @@ class InstituteDBPipeline(BasePipeline):
             return item
 
         if isinstance(item,CourseItem):
-            inst = item['institute'][0].get("i"
+            inst = item['institute'][0].get("i")
             inst = session.query(InstitutesData).get(inst.id)
             if len(inst.courses)  == 0:
                 #Add the course to Database

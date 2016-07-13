@@ -54,6 +54,7 @@ class CDSpider(scrapy.Spider):
         l.add_xpath( "website" , "//div[@class='web_block']//p[@class='lr_detail']/a/@href")
         l.add_xpath('address' ,'//div[@class="loc_block"]//h3/text()')
         l.add_xpath('facilities',"//span[@class='facility_name']/text()")
+        l.add_xpath('companies',"//img[contains(@class,'placement_logo')]/@title")
         link = response.url + "/courses-fees"
         a = l.load_item()
         yield scrapy.Request(link, callback = self.parse_institute_course , meta = {"college":a})
