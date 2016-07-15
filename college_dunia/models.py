@@ -1,19 +1,13 @@
-from sqlalchemy import or_,create_engine ,Enum, Column , Integer,Text , String , DateTime,ForeignKey,and_
+from sqlalchemy import or_,create_engine ,Enum, Column , Integer,Text , String , DateTime,ForeignKey,and_ , Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
-from sqlalchemy import Table
+from college_dunia.Session import session
 
-dbuser = "root"
-dbpass = "shikhar"
-dbhost = "localhost"
-dbname = "edunuts_beta"
 
 Base = declarative_base()
 
-def db_connect():
-    return create_engine("mysql+pymysql://%s:%s@%s/%s"%(dbuser,dbpass,dbhost,dbname),pool_recycle = 1800)
 
 class Basest():
 
@@ -26,7 +20,7 @@ class Basest():
     id =  Column(Integer, primary_key=True)
 
     @classmethod
-    def likeAll(self,attr,string,session):
+    def likeAll(self,attr,string):
         return session.query(self).filter(getattr(self,attr).like("%" + string + "%")).all()
 
 
@@ -41,7 +35,7 @@ class Institutes(Base,Basest):
     city = relationship("Cities",backref = "institutes")
 
     @classmethod
-    def likeAll(self,string,session):
+    def likeAll(self,string):
         return session.query(self).filter(self.name.like("%" + str(string) + "%")).all()
 
 
@@ -64,26 +58,27 @@ class InstitutesData(Institutes):
     address = Column(String)
     latitude = Column(String)
     longitude = Column(String)
+    page_url = Column(String)
     facilities = relationship("Facilities",secondary = institute_facilities,backref="institutes")
     companies = relationship("Companies",secondary = institute_companies,backref="institutes")
 
     @classmethod
-    def getFromURL(self,url,session):
+    def getFromURL(self,url):
         return session.query(self).filter(self.website.like("%" + url + "%")).first()
 
-    def setFacilities(self,session,facilities = []):
+    def setFacilities(self,facilities = []):
         print "Adding Facilities"
         for e in facilities:
             fac = session.query(Facilities).filter(Facilities.facility_name.like("%"+str(e)+"%")).first()
-            if fac is not None:
+            if fac is not None and fac not in self.facilities:
                 self.facilities.append(fac)
         return self
 
-    def setCompanies(self,session,companies = []):
+    def setCompanies(self,companies = []):
         print "Adding Companies"
         for e in companies:
             com = session.query(Companies).filter(Companies.company_name.like("%"+str(e)+"%")).first()
-            if com is not None:
+            if com is not None and com not in self.companies:
                 self.companies.append(com)
         return self
 
@@ -97,10 +92,10 @@ class Cities(Base):
     @property
     def name(self):
         return self.city_name
-    
+
 
     @classmethod
-    def likeAll(self,string,session):
+    def likeAll(self,string):
         return session.query(self).filter(self.city_name.like("%"+ string+"%")).all()
 
 class Subcourses(Base,Basest):
@@ -154,7 +149,7 @@ class InstituteCourses(Base, Basest):
     institute = relationship("Institutes")
 
     @classmethod
-    def courseInInstitute(self,fullname,abbr,session):
+    def courseInInstitute(self,fullname,abbr):
         results = session.query(self,Courses).join(self.institute).join(self.course).join(Courses.course).filter(and_(CourseNames.name.like("%"+abbr+"%"),CourseNames.fullname.like("%"+ fullname +"%"))).all()
         return iter([ e[1] for e in results ])
 

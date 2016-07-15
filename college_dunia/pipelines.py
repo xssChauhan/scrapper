@@ -1,139 +1,25 @@
 # -*- coding: utf-8 -*-
-from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import or_
 from models import *
 from college_dunia.items import InstituteItem, CourseItem
-from fuzzywuzzy.fuzz import token_sort_ratio as tsor , partial_ratio as pr
 import re,inspect
+from college_dunia.PipelineTools import PipelineTools
+from college_dunia.Session import session
 from scrapy.exceptions import DropItem
 from .helpers import DateParse
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
-class BasePipeline():
-    def __init__(self):
-        engine = db_connect()
-        self.Session = scoped_session(sessionmaker(bind = engine ))
-
-    def makeSession(self):
-        return self.Session()
-
-session = BasePipeline().makeSession()
-
-def closestMatch(s):
-    match = {
-        "s" : 0,
-    }
-    toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
-    for e in xrange(len(toMatch)//2 - 1,len(toMatch)):
-        i = InstitutesData.likeAll(toMatch[e],session)
-        for t in i:
-            score = tsor(s,t.name)
-            if score > match['s']:
-                match['s'] = score
-                match['d'] = t
-    return match
-
-def cityClosestMatch(s):
-    match = {
-        "s" : 0
-    }
-    toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
-    for e in xrange(len(toMatch)//2 -1, len(toMatch)):
-        c = Cities.likeAll(toMatch[e],session)
-        for t in c:
-            score = tsor(s,t.name)
-            if score > match.get('s'):
-                match['s'] = score
-                match['d'] = t
-    return match
-
-def courseClosestMatch(abbr,fullname,subcourse = ""):
-    match = {
-        "s" : 0,
-    }
-    s = abbr + " " + fullname
-    toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
-    for e in xrange(len(toMatch)//2 - 1,len(toMatch)):
-        i = session.query(Courses).join(Courses.course).join(Courses.subcourse).filter(or_(CourseNames.name.like("%"+abbr+"%"),CourseNames.fullname.like("%"+fullname+"%"),Subcourses.name.like("%"+ subcourse +"%"))).all()
-        for t in i:
-            score = tsor(abbr,t.getName) + tsor(fullname,t.getFullName) + tsor(subcourse,t.getSubcourse)
-            if score > match['s']:
-                match['s'] = score
-                match['d'] = t
-    return match
 
 
-def addCourseToInstitute(inst,course, **kwargs):
-    try:
-        ic = InstituteCourses(**kwargs)
-        ic.course = course
-        inst.courses.append(ic)
-
-        session.commit()
-        session.add(CrawlChange(table_name = ic.__tablename__ , modification = "new" , entity = ic.id))
-        session.commit()
-    except Exception as e:
-        print "Error while adding course to Institute" ,e
-        session.rollback()
-    else:
-        print course.getName + " " + course.getFullName + " " + course.getSubcourse + " " + inst.name
-    return 1
-
-def getPincode(string):
-    pattern = "\d{6}"
-    return re.findall(pattern,string)[0]
-
-def getLat(string):
-    pattern = "var\s+latd\s+=\s+([\d.]+)"
-    return re.findall(pattern,string)[0]
-
-def getLang(string):
-    pattern = "var\s+lngd\s+=\s+([\d.]+)"
-    return re.findall(pattern,string)[0]
-
-def getCity(string):
-    return string.split(",")[0]
-
-def getFoundedIn(string):
-    pattern = "(\d+)"
-    return re.findall(pattern,string)[0]
-
-def makeInstituteObject(item):
-    try:
-        i = InstitutesData()
-        for e in [x for x in dir(i) if not x.startswith("__") and not x.startswith("_") and x !="metadata" and x !="facilities" and x != "companies" and x != "city" and not inspect.ismethod(getattr(i,x))]:
-            if item.get(e) is not None:
-                setattr(i,e,item.get(e))
-                print e
-        i.city = cityClosestMatch(getCity(item.get('city'))).get('d')
-        i.founded_in = getFoundedIn(item.get('founded_in'))
-        i.website = item.get('website')
-        i.pincode = getPincode(item.get("address"))
-        i.latitude = getLat(item.get('latitude'))
-        i.longitude = getLang(item.get('longitude'))
-
-        return i
-    except Exception as e:
-        print "Error while making object ",e
-
-
-class InstituteDBPipeline(BasePipeline):
+class InstituteDBPipeline():
     def process_item(self, item, spider):
+        print "*************************************"
         if isinstance(item , InstituteItem):
-            match =  closestMatch(item.get('name') )
+            match =  PipelineTools.closestMatch(item.get('name') )
             if match.get('s') > 50 and match.get('d') is not None:
                 #Process the institute and find the data that is missing in our database from the scraped page and add it to the database
                 #processing the facilities and companies for now
                 institute = match.get('d')
-                institute.setFacilities(session,item.get('facilities') or []).setCompanies(session,item.get('companies') or [])
-                institute.founded_in = getFoundedIn(item.get('founded_in'))
-                institute.website = item.get('website')
-                institute.pincode = getPincode(item.get("address"))
-                institute.latitude = getLat(item.get('latitude'))
-                institute.longitude = getLat(item.get('longitude'))
-                institute.city =  cityClosestMatch(getCity(item.get('city'))).get('d')
+                institute.setFacilities(item.get('facilities') or []).setCompanies(item.get('companies') or [])
+                institute = PipelineTools.makeInstituteObject(item,institute)
                 try:
                     session.commit()
                     session.add(CrawlChange(table_name = institute.__tablename__,modification = "changed", entity = institute.id))
@@ -142,9 +28,9 @@ class InstituteDBPipeline(BasePipeline):
             else:
                 print "Adding To Database" + item.get('name')
                 try:
-                    institute = makeInstituteObject(item)
+                    institute = PipelineTools.makeInstituteObject(item)
                     session.add(institute)
-                    institute.setFacilities(session,item.get('facilities')).setCompanies(session,item.get('companies'))
+                    institute.setFacilities(item.get('facilities') or []).setCompanies(item.get('companies')  or [])
                     session.commit()
                     session.add(CrawlChange(table_name = institute.__tablename__,modification = "new",entity = institute.id))
                     session.commit()
@@ -165,9 +51,9 @@ class InstituteDBPipeline(BasePipeline):
                 course_abbr = course_abbr[0] if len(course_abbr) > 1 else ""
                 if item.get('subcourses') is not None:
                     for s in item.get('subcourses'):
-                        match = courseClosestMatch(str(course_abbr),course_full_name,str(s)).get('d')
-                        addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).replaceDays().replaceMonths().getDate() , fee = item.get("fees") )
+                        match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name,str(s)).get('d')
+                        PipelineTools.addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).getDate() , fee = item.get("fees") )
                 else:
-                    match = courseClosestMatch(str(course_abbr),course_full_name).get('d')
-                    addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).replaceDays().replaceMonths().getDate() , fee = item.get("fees"))
+                    match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name).get('d')
+                    PipelineTools.addCourseToInstitute(inst,match ,duration = DateParse(item.get("duration")).getDate() , fee = item.get("fees"))
                 return item

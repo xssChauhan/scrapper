@@ -2,8 +2,7 @@ import scrapy
 from scrapy.loader import ItemLoader
 from college_dunia.items import InstituteItem, CourseItem
 from scrapy.selector import XmlXPathSelector
-from college_dunia.models import InstitutesData
-from college_dunia.pipelines import closestMatch, BasePipeline,session
+from college_dunia.Session import session
 from college_dunia.helpers import DateParse, newResponse
 import logging
 from scrapy.utils.log import configure_logging
@@ -53,12 +52,13 @@ class CDSpider(scrapy.Spider):
         l.add_value( 'status' , "s")
         l.add_xpath( "website" , "//div[@class='web_block']//p[@class='lr_detail']/a/@href")
         l.add_xpath('address' ,'//div[@class="loc_block"]//h3/text()')
-        l.add_xpath('founded_in' ,'//html/body/div[5]/div[3]/div/div[1]/div/span[contains(.,"ESTD")]/text()')
+        l.add_xpath('founded_in' ,'//html/body/div[5]/div[3]/div/div[1]/div/span[contains(.,"Estd")]/text()')
         l.add_xpath('latitude' ,"//script[contains(.,'latd')]/text()")
         l.add_xpath('longitude' ,"//script[contains(.,'lngd')]/text()")
         l.add_xpath('facilities',"//span[@class='facility_name']/text()")
         l.add_xpath('companies',"//img[contains(@class,'placement_logo')]/@title")
         l.add_xpath("city","/html/body/div[5]/div[3]/div/div[1]/div/span[1]/text()")
+        l.add_value("page_url",response.url)
         link = response.url + "/courses-fees"
         a = l.load_item()
         yield scrapy.Request(link, callback = self.parse_institute_course , meta = {"college":a})
@@ -66,7 +66,7 @@ class CDSpider(scrapy.Spider):
 
     def parse_institute_course(self, response):
         instituteItem = response.meta.get('college')
-        matchInstitute = closestMatch(instituteItem.get('name')).get('d')
+        matchInstitute = PipelineTools.closestMatch(instituteItem.get('name')).get('d')
         if matchInstitute is None : print "From Pipeline , Match institute", matchInstitute," ", instituteItem.get("name")
 
         #load the courses

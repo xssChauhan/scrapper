@@ -42,6 +42,7 @@ class InstituteItem(Item):
     latitude = Field(output_processor = Join())
     longitude = Field(output_processor = Join())
     city = Field(output_processor = Join())
+    page_url = Field(output_processor = Join())
 
 class CourseItem(Item):
     name = Field(output_processor = Join())
@@ -57,7 +58,7 @@ class CourseItem(Item):
     def extractFullName(self):
         toReplace = self.extractAbbr()
         name = self.get('name')
-        
+
         for e in toReplace:
             name = name.replace("["+str(e)+"]","")
         return name
