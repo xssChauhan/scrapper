@@ -35,6 +35,20 @@ def closestMatch(s):
                 match['d'] = t
     return match
 
+def cityClosestMatch(s):
+    match = {
+        "s" : 0
+    }
+    toMatch = [ " ".join(s.split()[:e]) for e in xrange(1, len(s.split()) + 1) ]
+    for e in xrange(len(toMatch)//2 -1, len(toMatch)):
+        c = Cities.likeAll(toMatch[e],session)
+        for t in c:
+            score = tsor(s,t.name)
+            if score > match.get('s'):
+                match['s'] = score
+                match['d'] = t
+    return match
+
 def courseClosestMatch(abbr,fullname,subcourse = ""):
     match = {
         "s" : 0,
@@ -67,17 +81,44 @@ def addCourseToInstitute(inst,course, **kwargs):
         print course.getName + " " + course.getFullName + " " + course.getSubcourse + " " + inst.name
     return 1
 
+def getPincode(string):
+    pattern = "\d{6}"
+    return re.findall(pattern,string)[0]
+
+def getLat(string):
+    pattern = "var\s+latd\s+=\s+([\d.]+)"
+    return re.findall(pattern,string)[0]
+
+def getLang(string):
+    pattern = "var\s+lngd\s+=\s+([\d.]+)"
+    return re.findall(pattern,string)[0]
+
+def getCity(string):
+    return string.split(",")[0]
+
+def getFoundedIn(string):
+    pattern = "(\d+)"
+    return re.findall(pattern,string)[0]
 
 def makeInstituteObject(item):
     try:
         i = InstitutesData()
-        for e in [x for x in dir(i) if not x.startswith("__") and not x.startswith("_") and x !="metadata" and x !="facilities" and x != "companies" and not inspect.ismethod(getattr(i,x))]:
+        for e in [x for x in dir(i) if not x.startswith("__") and not x.startswith("_") and x !="metadata" and x !="facilities" and x != "companies" and x != "city" and not inspect.ismethod(getattr(i,x))]:
             if item.get(e) is not None:
                 setattr(i,e,item.get(e))
                 print e
+        i.city = cityClosestMatch(getCity(item.get('city'))).get('d')
+        i.founded_in = getFoundedIn(item.get('founded_in'))
+        i.website = item.get('website')
+        i.pincode = getPincode(item.get("address"))
+        i.latitude = getLat(item.get('latitude'))
+        i.longitude = getLang(item.get('longitude'))
+
         return i
     except Exception as e:
         print "Error while making object ",e
+
+
 class InstituteDBPipeline(BasePipeline):
     def process_item(self, item, spider):
         if isinstance(item , InstituteItem):
@@ -87,7 +128,12 @@ class InstituteDBPipeline(BasePipeline):
                 #processing the facilities and companies for now
                 institute = match.get('d')
                 institute.setFacilities(session,item.get('facilities') or []).setCompanies(session,item.get('companies') or [])
+                institute.founded_in = getFoundedIn(item.get('founded_in'))
                 institute.website = item.get('website')
+                institute.pincode = getPincode(item.get("address"))
+                institute.latitude = getLat(item.get('latitude'))
+                institute.longitude = getLat(item.get('longitude'))
+                institute.city =  cityClosestMatch(getCity(item.get('city'))).get('d')
                 try:
                     session.commit()
                     session.add(CrawlChange(table_name = institute.__tablename__,modification = "changed", entity = institute.id))
@@ -98,7 +144,7 @@ class InstituteDBPipeline(BasePipeline):
                 try:
                     institute = makeInstituteObject(item)
                     session.add(institute)
-                    institute.setFacilities(session,item.get('facilities'))
+                    institute.setFacilities(session,item.get('facilities')).setCompanies(session,item.get('companies'))
                     session.commit()
                     session.add(CrawlChange(table_name = institute.__tablename__,modification = "new",entity = institute.id))
                     session.commit()

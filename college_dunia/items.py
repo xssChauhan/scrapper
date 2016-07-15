@@ -36,8 +36,12 @@ class InstituteItem(Item):
                 input_processor = MapCompose( remove_tags , enter_filter),
                 output_processor = Join()
     )
+    founded_in = Field(output_processor = Join())
     facilities = Field()
     companies = Field()
+    latitude = Field(output_processor = Join())
+    longitude = Field(output_processor = Join())
+    city = Field(output_processor = Join())
 
 class CourseItem(Item):
     name = Field(output_processor = Join())

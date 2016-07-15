@@ -37,6 +37,8 @@ class Institutes(Base,Basest):
     name = Column(String)
     status = Column(String)
     courses = relationship("InstituteCourses")
+    city_id = Column(String,ForeignKey("cities.city_id"))
+    city = relationship("Cities",backref = "institutes")
 
     @classmethod
     def likeAll(self,string,session):
@@ -60,6 +62,8 @@ class InstitutesData(Institutes):
     founded_in = Column(String)
     about = Column(Text)
     address = Column(String)
+    latitude = Column(String)
+    longitude = Column(String)
     facilities = relationship("Facilities",secondary = institute_facilities,backref="institutes")
     companies = relationship("Companies",secondary = institute_companies,backref="institutes")
 
@@ -84,6 +88,20 @@ class InstitutesData(Institutes):
         return self
 
 
+
+class Cities(Base):
+    __tablename__ = "cities"
+    city_id = Column(Integer,primary_key = True)
+    city_name = Column(String)
+
+    @property
+    def name(self):
+        return self.city_name
+    
+
+    @classmethod
+    def likeAll(self,string,session):
+        return session.query(self).filter(self.city_name.like("%"+ string+"%")).all()
 
 class Subcourses(Base,Basest):
     __tablename__ = "subcourses"

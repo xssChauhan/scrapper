@@ -53,8 +53,12 @@ class CDSpider(scrapy.Spider):
         l.add_value( 'status' , "s")
         l.add_xpath( "website" , "//div[@class='web_block']//p[@class='lr_detail']/a/@href")
         l.add_xpath('address' ,'//div[@class="loc_block"]//h3/text()')
+        l.add_xpath('founded_in' ,'//html/body/div[5]/div[3]/div/div[1]/div/span[contains(.,"ESTD")]/text()')
+        l.add_xpath('latitude' ,"//script[contains(.,'latd')]/text()")
+        l.add_xpath('longitude' ,"//script[contains(.,'lngd')]/text()")
         l.add_xpath('facilities',"//span[@class='facility_name']/text()")
         l.add_xpath('companies',"//img[contains(@class,'placement_logo')]/@title")
+        l.add_xpath("city","/html/body/div[5]/div[3]/div/div[1]/div/span[1]/text()")
         link = response.url + "/courses-fees"
         a = l.load_item()
         yield scrapy.Request(link, callback = self.parse_institute_course , meta = {"college":a})
