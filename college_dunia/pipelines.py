@@ -11,9 +11,9 @@ from .helpers import DateParse
 
 class InstituteDBPipeline():
     def process_item(self, item, spider):
-        print "*************************************"
         if isinstance(item , InstituteItem):
             match =  PipelineTools.closestMatch(item.get('name') )
+            print "*************************************"
             if match.get('s') > 50 and match.get('d') is not None:
                 #Process the institute and find the data that is missing in our database from the scraped page and add it to the database
                 #processing the facilities and companies for now
