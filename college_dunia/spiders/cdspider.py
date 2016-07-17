@@ -4,6 +4,7 @@ from college_dunia.items import InstituteItem, CourseItem
 from scrapy.selector import XmlXPathSelector
 from college_dunia.Session import session
 from college_dunia.helpers import DateParse, newResponse
+from college_dunia.PipelineTools import PipelineTools
 import logging
 from scrapy.utils.log import configure_logging
 from datetime import datetime
