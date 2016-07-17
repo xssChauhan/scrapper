@@ -51,9 +51,9 @@ class InstituteDBPipeline():
                 course_abbr = course_abbr[0] if len(course_abbr) > 1 else ""
                 if item.get('subcourses') is not None:
                     for s in item.get('subcourses'):
-                        match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name,str(s)).get('d')
+                        match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name,str(s))
                         PipelineTools.addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).getDate() , fee = item.get("fees") )
                 else:
-                    match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name).get('d')
+                    match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name)
                     PipelineTools.addCourseToInstitute(inst,match ,duration = DateParse(item.get("duration")).getDate() , fee = item.get("fees"))
                 return item
