@@ -69,30 +69,42 @@ class PipelineTools(object):
     @classmethod
     def getPincode(self,string):
         pattern = "\d{6}"
+        if string is None : 
+            return None
         return re.findall(pattern,string)[0]
 
     @classmethod
     def getLat(self,string):
         pattern = "var\s+latd\s+=\s+([\d.]+)"
+        if string is None : 
+            return None
         return re.findall(pattern,string)[0]
 
     @classmethod
     def getLang(self,string):
         pattern = "var\s+lngd\s+=\s+([\d.]+)"
+        if string is None : 
+            return None
         return re.findall(pattern,string)[0]
 
     @classmethod
     def getCity(self,string):
+        if string is None : 
+            return None
         return string.split(",")[0]
 
     @classmethod
     def getFoundedIn(self,string):
         pattern = "(\d+)"
+        if string is None : 
+            return None
         return re.findall(pattern,string)[0]
 
     @classmethod
     def getCity(self,string):
         pattern = "(\w+)"
+        if string is None : 
+            return None
         return re.findall(pattern,string)[0]
 
     @classmethod
