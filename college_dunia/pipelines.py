@@ -11,9 +11,9 @@ from .helpers import DateParse
 
 class InstituteDBPipeline():
     def process_item(self, item, spider):
-        print "*************************************"
         if isinstance(item , InstituteItem):
             match =  PipelineTools.closestMatch(item.get('name') )
+            print "*************************************"
             if match.get('s') > 50 and match.get('d') is not None:
                 #Process the institute and find the data that is missing in our database from the scraped page and add it to the database
                 #processing the facilities and companies for now
@@ -51,9 +51,9 @@ class InstituteDBPipeline():
                 course_abbr = course_abbr[0] if len(course_abbr) > 1 else ""
                 if item.get('subcourses') is not None:
                     for s in item.get('subcourses'):
-                        match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name,str(s)).get('d')
+                        match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name,str(s))
                         PipelineTools.addCourseToInstitute(inst,match,duration = DateParse(item.get("duration")).getDate() , fee = item.get("fees") )
                 else:
-                    match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name).get('d')
+                    match = PipelineTools.courseClosestMatch(str(course_abbr),course_full_name)
                     PipelineTools.addCourseToInstitute(inst,match ,duration = DateParse(item.get("duration")).getDate() , fee = item.get("fees"))
                 return item
