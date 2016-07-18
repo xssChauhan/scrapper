@@ -24,10 +24,12 @@ def stupid_filter_father(item):
 def ascii_filter(item):
     return item[0].decode('unicode_escape').encode('ascii','ignore')
 
+def name_filter(item):
+    return item[0].split(',')[0]
 
 class InstituteItem(Item):
     name = Field(
-        input_processor = MapCompose(remove_tags),
+        input_processor = MapCompose(name_filter),
         output_processor = Join()
     )
     status = Field(output_processor = Join())

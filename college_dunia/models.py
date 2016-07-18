@@ -13,11 +13,12 @@ class Basest():
 
     def __init__(self,*args,**kwargs):
         self.metad = kwargs
+
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
 
-    id =  Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
 
     @classmethod
     def likeAll(self,attr,string):
@@ -153,6 +154,7 @@ class InstituteCourses(Base, Basest):
         results = session.query(self,Courses).join(self.institute).join(self.course).join(Courses.course).filter(and_(CourseNames.name.like("%"+abbr+"%"),CourseNames.fullname.like("%"+ fullname +"%"))).all()
         return iter([ e[1] for e in results ])
 
+
 class CrawlChange(Base):
     __tablename__ = "crawl_changed"
     id = Column(Integer,primary_key = True)
@@ -169,7 +171,6 @@ class Facilities(Base):
     @property
     def name(self):
         return self.facility_name
-
 
 
 class Companies(Base):
