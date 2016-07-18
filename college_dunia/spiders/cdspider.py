@@ -36,7 +36,7 @@ class CDSpider(scrapy.Spider):
         c = ItemLoader( item = CourseItem() , response = response )
         c.add_xpath("name" , "//span[@class='course_name']/text()")
         c.add_xpath("seats" , "//span[@class='course_info seats']/text()")
-        c.add_xpath("fees" ,"//span[@class='fees']/text()")
+        c.add_xpath("fee" ,"//span[@class='fees']/text()")
 
         print c.load_item()
 
