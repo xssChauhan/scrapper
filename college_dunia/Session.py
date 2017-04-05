@@ -1,11 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-dbuser = "root"
-dbpass = "shikhar"
-dbhost = "localhost"
-dbname = "edunuts_beta"
-
 
 
 class BaseSession():
